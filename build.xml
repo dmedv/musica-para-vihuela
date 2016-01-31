@@ -57,7 +57,7 @@
     </copy>
     
     <copy  todir="${build.home}/WEB-INF/lib">
-      <fileset dir="${lib.home}" excludes="javax.servlet-api-*"/>
+      <fileset dir="${lib.home}" excludes="javax.servlet-api-*,.gitkeep"/>
     </copy>
   </target>
 
