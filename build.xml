@@ -55,6 +55,10 @@
     <copy  todir="${build.home}/WEB-INF/classes">
       <fileset dir="${src.home}" excludes="**/*.java"/>
     </copy>
+    
+    <copy  todir="${build.home}/WEB-INF/lib">
+      <fileset dir="${lib.home}" excludes="javax.servlet-api-*"/>
+    </copy>
   </target>
 
 
