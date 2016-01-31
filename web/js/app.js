@@ -3,5 +3,3 @@ angular.module('vihuelaApp', [
   'vihuelaApp.filters',
   'ui.bootstrap'
 ]);
-
-
