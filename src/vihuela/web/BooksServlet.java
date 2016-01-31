@@ -23,45 +23,45 @@ import vihuela.data.Book;
 
 public class BooksServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LogManager.getLogger(BooksServlet.class.getName());
-	
-	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		
-		ObjectMapper mapper = new ObjectMapper();
-		resp.setContentType("application/json; charset=UTF-8");
-		try {
-			PrintWriter out = resp.getWriter();
-			conn = DriverManager.getConnection(DbcpManagerListener.getPoolableUri());
-			
-			stmt = conn.createStatement();
-			rs =  stmt.executeQuery("SELECT book_id, title FROM books");
-			ArrayList<Book> list = new ArrayList<Book>();
-			while (rs.next()) {
-				Book book = new Book();
-				book.setBookId(rs.getInt(1));
-				book.setTitle(rs.getString(2));
-				list.add(book);
-			}
-			
-			mapper.writeValue(out, list);
-		}
-		catch (SQLException ex) {
-			logger.error("Database error",ex);
-			resp.setStatus(500);
-		}
-		catch (Exception ex) {
-			logger.error("Unexpected error",ex);
-			resp.setStatus(500);
-		}
-		finally {
-			try { if (rs != null) rs.close(); } catch (Exception ex) { }
-			try { if (stmt != null) stmt.close(); } catch (Exception ex) { }
-			try { if (conn != null) conn.close(); } catch (Exception ex) { }
-		}
-	}
+  private static final long serialVersionUID = 1L;
+  private static final Logger logger = LogManager.getLogger(BooksServlet.class.getName());
+  
+  @Override
+  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    Connection conn = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+    
+    ObjectMapper mapper = new ObjectMapper();
+    resp.setContentType("application/json; charset=UTF-8");
+    try {
+      PrintWriter out = resp.getWriter();
+      conn = DriverManager.getConnection(DbcpManagerListener.getPoolableUri());
+      
+      stmt = conn.createStatement();
+      rs =  stmt.executeQuery("SELECT book_id, title FROM books");
+      ArrayList<Book> list = new ArrayList<Book>();
+      while (rs.next()) {
+        Book book = new Book();
+        book.setBookId(rs.getInt(1));
+        book.setTitle(rs.getString(2));
+        list.add(book);
+      }
+      
+      mapper.writeValue(out, list);
+    }
+    catch (SQLException ex) {
+      logger.error("Database error",ex);
+      resp.setStatus(500);
+    }
+    catch (Exception ex) {
+      logger.error("Unexpected error",ex);
+      resp.setStatus(500);
+    }
+    finally {
+      try { if (rs != null) rs.close(); } catch (Exception ex) { }
+      try { if (stmt != null) stmt.close(); } catch (Exception ex) { }
+      try { if (conn != null) conn.close(); } catch (Exception ex) { }
+    }
+  }
 }
