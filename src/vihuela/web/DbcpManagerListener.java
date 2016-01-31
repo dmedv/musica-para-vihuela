@@ -17,9 +17,9 @@ import org.apache.logging.log4j.Logger;
 public class DbcpManagerListener implements ServletContextListener {
   
   public static final String DBCP_POOL_NAME   = "vihuela";
-  public static final String DBCP_URI_PREFIX   = "jdbc:apache:commons:dbcp:";
-  public static final String DB_DRIVER_CLASS   = "Database.DriverClass";
-  public static final String DB_URI      = "Database.Uri";
+  public static final String DBCP_URI_PREFIX  = "jdbc:apache:commons:dbcp:";
+  public static final String DB_DRIVER_CLASS  = "Database.DriverClass";
+  public static final String DB_URI           = "Database.Uri";
   
   private PoolingDriver poolingDriver;
   private Driver dbDriver;
@@ -30,23 +30,28 @@ public class DbcpManagerListener implements ServletContextListener {
   public void contextDestroyed(ServletContextEvent event) {
     logger.info("Closing connection pool");
     
-    try 
-      { poolingDriver.closePool(DBCP_POOL_NAME); }
-    catch (Exception ex) 
-      { logger.error("Failed to close connection pool", ex); }
-    
+    try { 
+      poolingDriver.closePool(DBCP_POOL_NAME); 
+    }
+    catch (Exception ex) { 
+      logger.error("Failed to close connection pool", ex); 
+    }
     
     logger.info("Unregistering JDBC drivers");
     
-    try 
-      { DriverManager.deregisterDriver(poolingDriver); }
-    catch (Exception ex) 
-      { logger.error("Failed to unregister JDBC driver", ex); }
+    try { 
+      DriverManager.deregisterDriver(poolingDriver); 
+    }
+    catch (Exception ex) { 
+      logger.error("Failed to unregister JDBC driver", ex); 
+    }
 
-    try 
-      { DriverManager.deregisterDriver(dbDriver); }
-    catch (Exception ex) 
-      { logger.error("Failed to unregister JDBC driver", ex); }
+    try { 
+      DriverManager.deregisterDriver(dbDriver); 
+    }
+    catch (Exception ex) { 
+      logger.error("Failed to unregister JDBC driver", ex); 
+    }
   }
 
   @Override
@@ -63,12 +68,12 @@ public class DbcpManagerListener implements ServletContextListener {
       GenericObjectPool connectionPool = new GenericObjectPool(null);
       connectionPool.setTestOnBorrow(true);
       
-      ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(dbUri,null);
-      PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,connectionPool,null,"SELECT 1",false,true);
+      ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(dbUri, null);
+      PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, connectionPool, null, "SELECT 1", false, true);
       
       Class.forName("org.apache.commons.dbcp.PoolingDriver");
       poolingDriver = (PoolingDriver)DriverManager.getDriver(DBCP_URI_PREFIX);
-      poolingDriver.registerPool(DBCP_POOL_NAME,connectionPool);
+      poolingDriver.registerPool(DBCP_POOL_NAME, connectionPool);
     }
     catch (Exception ex) {
       logger.error("Failed to initialize connection pool",ex);
