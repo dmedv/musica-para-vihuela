@@ -44,25 +44,34 @@ export class InfoComponent {
           this.route.params.first().subscribe((params: Params) => {
             // Navigation parameters received
             
-            var bookId = Number(params['bookId']);
-            var itemId = Number(params['itemId']);
+            let bookId = Number(params['bookId']);
+            let itemId = Number(params['itemId']);
             
-            Observable.forkJoin([
-                  this.catalogService.getAuthors(), 
-                  this.catalogService.getBooks()])  
-              .subscribe(data => {
-                // Got all books and authors
+            let f = function(that, bookId, itemId) {
+              if (that.keepCurrentBook) {
+                that.setItem(itemId)
+              }
+              else {
+                that.setBookAndItem(bookId, itemId);
+              }
+            }
+            
+            if (this.authors && this.books) {
+              f(this, bookId, itemId);
+            }
+            else {
+              Observable.forkJoin([
+                    this.catalogService.getAuthors(), 
+                    this.catalogService.getBooks()])  
+                .subscribe(data => {
+                  // Got all books and authors
 
-                this.authors = data[0];
-                this.books = data[1];
-                
-                if (this.keepCurrentBook) {
-                  this.setItem(itemId)
-                }
-                else {
-                  this.setBookAndItem(bookId, itemId);
-                }
-              })
+                  this.authors = data[0];
+                  this.books = data[1];
+                  
+                  f(this, bookId, itemId);
+                })
+            }
           })
         }
       });
@@ -141,7 +150,7 @@ export class InfoComponent {
   getAuthorName(item: Item) {
     if (!item) return '-';
     
-    for(var author of this.authors)
+    for(let author of this.authors)
     {
       if(author.authorId == item.authorId) return author.name;
     }
@@ -150,7 +159,7 @@ export class InfoComponent {
   getTypeName(item: Item) {
     if (!item) return '-';
     
-    for(var type of this.types)
+    for(let type of this.types)
     {
       if(type.typeId == item.typeId) return type.title;
     }
@@ -173,7 +182,7 @@ export class InfoComponent {
   }
 
   updatePages(item: Item) {
-    var infoContent = document.getElementById('infoContent');
+    let infoContent = document.getElementById('infoContent');
     if (this.currentItem) {
       this.catalogService.getPages(item.bookId, item.itemId, 'json').subscribe(x => {
         this.pages = x;
@@ -197,13 +206,12 @@ export class InfoComponent {
       return;
     }
     this.items = [];
-    var query = (<HTMLInputElement>document.getElementById("searchInput")).value;
+    let query = (<HTMLInputElement>document.getElementById("searchInput")).value;
     
     if (query && !/^\s*$/.test(query)) {
       query = '%'+query+'%';
     }
     
-    query = encodeURIComponent(query);
     this.chapters = [new Chapter(-1, '*')];
     this.selectedChapterId = this.chapters[0].chapterId;
     (<HTMLSelectElement>document.getElementById("chapterSelect")).disabled = true;

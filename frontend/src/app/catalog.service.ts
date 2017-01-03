@@ -23,9 +23,9 @@ export class CatalogService {
   }
 
   getItems(bookId: number, query: string = null): Observable<Item[]> {
-    var url = this.itemsUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
+    let url = this.itemsUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
     if (query) {
-        url += ('?query=' + query);
+        url += ('?query=' + encodeURIComponent(query));
     }
     
     return this.http.get(url)
@@ -43,9 +43,9 @@ export class CatalogService {
   }
 
   getTypes(bookId: number, query: string = null): Observable<Type[]> {
-    var url = this.typesUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
+    let url = this.typesUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
     if (query) {
-        url += ('?query=' + query);
+        url += ('?query=' + encodeURIComponent(query));
     }
     return this.http.get(url)
         .map((res: Response) => { return res.json() || {}; });
