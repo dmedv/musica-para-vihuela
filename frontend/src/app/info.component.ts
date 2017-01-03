@@ -185,7 +185,7 @@ export class InfoComponent {
   }
   
   keyboardEventHandler(event) {
-    if (event.code == 'Enter') {
+    if (event.keyCode == 13) {
       this.search();
     }
   }
