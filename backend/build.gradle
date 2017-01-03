@@ -1,0 +1,73 @@
+apply plugin: 'java'
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+
+        output.classesDir = 'build/classes'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compileOnly 'org.apache.tomcat:tomcat-servlet-api:8.0.39'
+    compileOnly 'org.apache.tomcat:tomcat-jsp-api:8.0.39'
+    compileOnly 'org.apache.tomcat:tomcat-annotations-api:8.0.39'
+    
+    compile 'commons-io:commons-io:2.5'
+    compile 'org.apache.logging.log4j:log4j-core:2.7'
+    compile 'org.apache.logging.log4j:log4j-api:2.7'
+    compile 'org.springframework:spring-core:4.3.4.RELEASE'
+    compile 'org.springframework:spring-webmvc:4.3.4.RELEASE'
+    compile 'org.springframework:spring-web:4.3.4.RELEASE'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.8.5'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.5'
+    compile 'mysql:mysql-connector-java:6.0.5'
+    compile 'commons-dbutils:commons-dbutils:1.6'
+    compile 'com.zaxxer:HikariCP:2.5.1'
+    compile 'org.apache.pdfbox:pdfbox:1.8.7'
+    compile 'org.apache.pdfbox:fontbox:1.8.7'
+}
+
+task cleanExtra(type: Delete) {
+    delete 'dist', 'WebContent/WEB-INF/application.properties'
+}
+
+clean.dependsOn('cleanExtra');
+
+war {
+    destinationDir = file('dist')
+
+    webInf {
+        from('WebContent/WEB-INF') {
+            include '*'
+        }
+
+        from('conf') {
+            include 'application.properties'
+        }
+
+        from('src') {
+            into 'classes'
+            exclude '**/*.java'
+        }
+    }
+}
+
+task deleteLibs(type: Delete) {
+    delete fileTree('WebContent/WEB-INF/lib') {
+        include '**/*'
+    }
+}
+
+task copyLibs(type: Copy) {
+    into 'WebContent/WEB-INF/lib'
+    from configurations.runtime
+}
+
