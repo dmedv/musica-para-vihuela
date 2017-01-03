@@ -19,41 +19,36 @@ export class CatalogService {
 
   getBooks(): Observable<Book[]> {
     return this.http.get(this.booksUrl)
-        .map((res: Response) => { return res.json() || {}; })
-        .first();
+        .map((res: Response) => { return res.json() || {}; });
   }
 
-  getItems(bookId: number, query:string): Observable<Item[]> {
+  getItems(bookId: number, query: string = null): Observable<Item[]> {
     var url = this.itemsUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
     if (query) {
         url += ('?query=' + query);
     }
     
     return this.http.get(url)
-        .map((res: Response) => { return res.json() || {}; })
-        .first();
+        .map((res: Response) => { return res.json() || {}; });
   }
 
   getChapters(bookId: number): Observable<Chapter[]> {
     return this.http.get(this.chaptersUrl.replace(/\{bookId\}/g, String(bookId)))
-        .map((res: Response) => { return res.json() || {}; })
-        .first();
+        .map((res: Response) => { return res.json() || {}; });
   }
 
   getAuthors(): Observable<Author[]> {
     return this.http.get(this.authorsUrl)
-        .map((res: Response) => { return res.json() || {}; })
-        .first();
+        .map((res: Response) => { return res.json() || {}; });
   }
 
-  getTypes(bookId: number, query: string): Observable<Type[]> {
+  getTypes(bookId: number, query: string = null): Observable<Type[]> {
     var url = this.typesUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
     if (query) {
         url += ('?query=' + query);
     }
     return this.http.get(url)
-        .map((res: Response) => { return res.json() || {}; })
-        .first();
+        .map((res: Response) => { return res.json() || {}; });
   }
 
   getPages(bookId: number, itemId: number, output: string): Observable<Page[]> {
@@ -61,7 +56,6 @@ export class CatalogService {
       .replace(/\{bookId\}/g, String(bookId))
       .replace(/\{itemId\}/g, String(itemId))
       .replace(/\{output\}/g, output))
-        .map((res: Response) => { return res.json() || {}; })
-        .first();
+        .map((res: Response) => { return res.json() || {}; });
   }
 }

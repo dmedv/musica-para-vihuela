@@ -22,10 +22,11 @@ export class InfoComponent {
   chapters: Chapter[];
   pages: Page[];
   searchAll = true;
-  showBookId = false;
+  isSearchResult = false;
   selectedTypeId: number = -1;
   selectedChapterId: number = -1;
-
+  navigate = false;
+  
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -51,34 +52,47 @@ export class InfoComponent {
                   this.catalogService.getBooks()])  
               .subscribe(data => {
                 // Got all books and authors
-                
+
                 this.authors = data[0];
                 this.books = data[1];
-                this.setBookAndItem(bookId, itemId);
+                
+                if (this.navigate) {
+                  this.setCurrentItem(itemId)
+                }
+                else {
+                  this.isSearchResult = false;
+                  this.setBookAndItem(bookId, itemId);
+                }
               })
           })
         }
       });
   }
 
-  setBookAndItem(bookId, itemId) {
-    this.setCurrentBook((bookId)?this.books.find((y:Book) => y.bookId == bookId):this.books[0], itemId);
+  navigateToItem(item: Item) {
+    this.navigate = true;
+    this.router.navigate(['', item.bookId, item.itemId]);
   }
-
-  setCurrentBook(book: Book, itemId = null) {
+  
+  navigateToBook(book: Book) {
+    this.navigate = false;
+    this.router.navigate(['', book.bookId, 1]);
+  }
+  
+  setBookAndItem(bookId: number, itemId: number) {
+    let book = this.books.find((y:Book) => y.bookId == bookId);
     this.currentBook = book;
-    this.showBookId = false;
+    this.updateChapters(book);
+    this.updateTypes(book);
+    
     (<HTMLSelectElement>document.getElementById("chapterSelect")).disabled = false;
     
-    this.catalogService.getItems(book.bookId, null).subscribe(x => {
+    this.catalogService.getItems(book.bookId).subscribe(x => {
       this.items = x;
-      this.setCurrentItem((itemId)?x.find((y:Item) => y.itemId == itemId):x[0]);
+      this.setCurrentItem(itemId);
     })
-    
-    this.updateChapters(book);
-    this.updateTypes(book, null);
   }
-
+  
   showContent() {
     document.getElementById('infoContent').style.display = 'block';
     document.getElementById('previewContent').style.display = 'block';
@@ -89,8 +103,9 @@ export class InfoComponent {
     document.getElementById('previewContent').style.display = 'none';
   }
   
-  setCurrentItem(item: Item) {
+  setCurrentItem(itemId: number) {
     this.hideContent();
+    let item: Item = (itemId)?this.items.find((y:Item) => y.itemId == itemId):this.items[0];
     this.currentItem = item;
     this.updatePages(item);
   }
@@ -135,8 +150,8 @@ export class InfoComponent {
     }
   }
 
-  updateTypes(book: Book, query: string) {
-    this.catalogService.getTypes((book)?book.bookId:null, query).subscribe(x => {
+  updateTypes(book: Book, query: string = null) {
+    this.catalogService.getTypes((book) ? book.bookId : null, query).subscribe(x => {
       this.types = x;
       this.types.unshift(new Type(-1,'*'));
       this.selectedTypeId = -1;
@@ -170,6 +185,7 @@ export class InfoComponent {
   }
   
   search() {
+    this.isSearchResult = true;
     if (!this.searchAll && !this.currentBook) {
       alert('You must select a book first');
       return;
@@ -189,12 +205,11 @@ export class InfoComponent {
    
     if (this.searchAll) {
       this.currentBook = null;
-      this.showBookId = true;
     }
     
     this.catalogService.getItems((this.searchAll)?null:(this.currentBook.bookId), query).subscribe(x => {
       this.items = x;
-      this.setCurrentItem(x[0]);
+      this.setCurrentItem(x[0].itemId);
     })
     
   }

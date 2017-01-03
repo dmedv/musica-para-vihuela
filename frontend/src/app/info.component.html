@@ -11,7 +11,7 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                  <li *ngFor="let book of books" (click)="setCurrentBook(book)">
+                  <li *ngFor="let book of books" (click)="navigateToBook(book)">
                     <a class="selectable">{{getBookTitle(book)}}</a>
                   </li>
                 </ul>
@@ -39,8 +39,8 @@
     <div class="col-xs-4">
       <div id="itemsPanel">
         <ul class="nav nav-pills nav-stacked">
-          <li *ngFor="let item of items | itemFilter:[selectedChapterId, selectedTypeId]" (click)="router.navigate(['', item.bookId, item.itemId])">
-            <a class="selectable">{{getTitle(item, showBookId)}}&nbsp;</a>
+          <li *ngFor="let item of items | itemFilter:[selectedChapterId, selectedTypeId]" (click)="navigateToItem(item)">
+            <a class="selectable">{{getTitle(item, isSearchResult)}}&nbsp;</a>
           </li>
         </ul>
       </div>
