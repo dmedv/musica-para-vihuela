@@ -40,7 +40,7 @@
       <div id="itemsPanel">
         <ul class="nav nav-pills nav-stacked">
           <li *ngFor="let item of items | itemFilter:[selectedChapterId, selectedTypeId]" (click)="navigateToItem(item)">
-            <a class="selectable">{{getTitle(item, isSearchResult)}}&nbsp;</a>
+            <a class="selectable">{{getItemTitle(item, isSearchResult)}}&nbsp;</a>
           </li>
         </ul>
       </div>
@@ -51,15 +51,15 @@
           <button id="pdfButton" class="btn btn-md btn-primary pagesButton" type="button" (click)="downloadPdf(currentItem)">Download PDF</button>
           <button id="zipButton" class="btn btn-md btn-primary pagesButton" type="button" (click)="downloadZip(currentItem)">Download images</button>
           <h3>Book:</h3>
-          <p>{{(currentItem?.authorId==-1)?'-':getBookForItem(currentItem)?.title}}</p>
+          <p>{{getBookTitle(getBookForItem(currentItem), false)}}</p>
           <h3>Author:</h3>
-          <p>{{(currentItem?.authorId==-1)?'-':getAuthor(currentItem)}}</p>
+          <p>{{getAuthorName(currentItem)}}</p>
           <h3>Title:</h3>
-          <p>{{(currentItem?.title=='')?'-':getTitle(currentItem, false)}}</p>
+          <p>{{getItemTitle(currentItem, false)}}</p>
           <h3>Type:</h3>
-          <p>{{(currentItem?.typeId==0)?'-':getType(currentItem)}}</p>
+          <p>{{getTypeName(currentItem)}}</p>
           <h3>Notes:</h3>
-          <p>{{(currentItem?.notes=='')?'-':currentItem?.notes}}</p>
+          <p>{{getNotes(currentItem)}}</p>
         </div>
       </div>
     </div>

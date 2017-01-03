@@ -25,7 +25,7 @@ export class InfoComponent {
   isSearchResult = false;
   selectedTypeId: number = -1;
   selectedChapterId: number = -1;
-  navigate = false;
+  keepCurrentBook = false;
   
   constructor(
     private router: Router,
@@ -56,11 +56,10 @@ export class InfoComponent {
                 this.authors = data[0];
                 this.books = data[1];
                 
-                if (this.navigate) {
-                  this.setCurrentItem(itemId)
+                if (this.keepCurrentBook) {
+                  this.setItem(itemId)
                 }
                 else {
-                  this.isSearchResult = false;
                   this.setBookAndItem(bookId, itemId);
                 }
               })
@@ -70,17 +69,18 @@ export class InfoComponent {
   }
 
   navigateToItem(item: Item) {
-    this.navigate = true;
+    this.keepCurrentBook = true;
     this.router.navigate(['', item.bookId, item.itemId]);
   }
   
   navigateToBook(book: Book) {
-    this.navigate = false;
+    this.keepCurrentBook = false;
+    this.isSearchResult = false;
     this.router.navigate(['', book.bookId, 1]);
   }
   
   setBookAndItem(bookId: number, itemId: number) {
-    let book = this.books.find((y:Book) => y.bookId == bookId);
+    let book = this.books.find((x: Book) => x.bookId == bookId);
     this.currentBook = book;
     this.updateChapters(book);
     this.updateTypes(book);
@@ -89,7 +89,7 @@ export class InfoComponent {
     
     this.catalogService.getItems(book.bookId).subscribe(x => {
       this.items = x;
-      this.setCurrentItem(itemId);
+      this.setItem(itemId);
     })
   }
   
@@ -103,27 +103,33 @@ export class InfoComponent {
     document.getElementById('previewContent').style.display = 'none';
   }
   
-  setCurrentItem(itemId: number) {
+  setItem(itemId: number) {
     this.hideContent();
-    let item: Item = (itemId)?this.items.find((y:Item) => y.itemId == itemId):this.items[0];
+    let item: Item = this.items.find((x: Item) => x.itemId == itemId);
     this.currentItem = item;
     this.updatePages(item);
   }
 
-  getTitle(item: Item, showBookId: boolean) {
-    if (item) {
-      var result = item.title.replace(/\#/g, ' ');
-      if (showBookId) { 
-        result = '(' + item.bookId + ') ' + result;
-      }
-      return result;
+  getItemTitle(item: Item, showBookId: boolean) {
+    if (!item) return '-';
+    
+    let s = item.title.replace(/\#/g, ' ');
+    if (showBookId) { 
+      s = '(' + item.bookId + ') ' + s;
     }
+    return s;
   }
-
-  getBookTitle(book: Book) {
-    if (book) { 
-      return book.bookId + '. ' + book.title;
-    }
+  
+  getNotes(item: Item) {
+    if (!item || !item.notes) return '-';
+    
+    return item.notes;
+  }
+  
+  getBookTitle(book: Book, showId: boolean = true) {
+    if (!book) return '-';
+    
+    return (showId)?(book.bookId + '. ' + book.title):book.title;
   }
   
   getBookForItem(item: Item) {
@@ -132,21 +138,21 @@ export class InfoComponent {
     }
   }
   
-  getAuthor(item: Item) {
-    if (item && this.authors) {
-      for(var author of this.authors)
-      {
-        if(author.authorId == item.authorId) return author.name;
-      }
+  getAuthorName(item: Item) {
+    if (!item) return '-';
+    
+    for(var author of this.authors)
+    {
+      if(author.authorId == item.authorId) return author.name;
     }
   }
 
-  getType(item: Item) {
-    if (item && this.types) {
-      for(var type of this.types)
-      {
-        if(type.typeId == item.typeId) return type.title;
-      }
+  getTypeName(item: Item) {
+    if (!item) return '-';
+    
+    for(var type of this.types)
+    {
+      if(type.typeId == item.typeId) return type.title;
     }
   }
 
@@ -209,7 +215,7 @@ export class InfoComponent {
     
     this.catalogService.getItems((this.searchAll)?null:(this.currentBook.bookId), query).subscribe(x => {
       this.items = x;
-      this.setCurrentItem(x[0].itemId);
+      this.setItem(x[0].itemId);
     })
     
   }
