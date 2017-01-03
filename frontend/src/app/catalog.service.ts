@@ -6,12 +6,12 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class CatalogService {
-  private booksUrl = 'http://localhost:8080/musica-para-vihuela/api/books';
-  private itemsUrl = 'http://localhost:8080/musica-para-vihuela/api/books/{bookId}/items'
-  private authorsUrl = 'http://localhost:8080/musica-para-vihuela/api/authors';
-  private typesUrl = 'http://localhost:8080/musica-para-vihuela/api/books/{bookId}/types';
-  private pagesUrl = 'http://localhost:8080/musica-para-vihuela/api/books/{bookId}/items/{itemId}/{output}';
-  private chaptersUrl = 'http://localhost:8080/musica-para-vihuela/api/books/{bookId}/chapters'
+  private booksUrl = '/api/books';
+  private itemsUrl = '/api/books/{bookId}/items'
+  private authorsUrl = '/api/authors';
+  private typesUrl = '/api/books/{bookId}/types';
+  private pagesUrl = '/api/books/{bookId}/items/{itemId}/{output}';
+  private chaptersUrl = '/api/books/{bookId}/chapters'
 
   constructor (private http: Http) {}
 
