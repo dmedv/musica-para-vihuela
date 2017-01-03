@@ -1,0 +1,10 @@
+build
+dist
+
+/WebContent/WEB-INF/lib
+/WebContent/WEB-INF/application.properties
+
+.project
+.classpath
+.settings
+.gradle
