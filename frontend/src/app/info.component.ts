@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params, NavigationEnd, Event } from '@angular/router';
 import { Book, Item, Author, Page, Type, Chapter } from './model';
 import { CatalogService } from './catalog.service';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/first';
 
 @Component({
@@ -10,6 +12,7 @@ import 'rxjs/add/operator/first';
 })
 
 export class InfoComponent {
+
   books: Book[];
   currentBook: Book;
   items: Item[];
@@ -27,25 +30,39 @@ export class InfoComponent {
     private router: Router,
     private route: ActivatedRoute,
     private catalogService: CatalogService) {
-  }
 
-  ngOnInit() {   
-    this.catalogService.getAuthors().first().subscribe(x => {
-      this.authors = x;
-    })
+      // This is tricky... We can't just subscribe to 
+      // route.params in onNgInit, because onNgInit 
+      // is not called during navigation within 
+      // the same component.
 
-    this.route.params.first().subscribe((params: Params) => {
-      var bookId = Number(params['bookId']);
-      var itemId = Number(params['itemId']);
-      this.setBookAndItem(bookId, itemId);
-    })
+      router.events.subscribe((x: Event) => {
+        if (x instanceof NavigationEnd) {
+          // NavigationEnd event captured
+    
+          this.route.params.first().subscribe((params: Params) => {
+            // Navigation parameters received
+            
+            var bookId = Number(params['bookId']);
+            var itemId = Number(params['itemId']);
+            
+            Observable.forkJoin([
+                  this.catalogService.getAuthors(), 
+                  this.catalogService.getBooks()])  
+              .subscribe(data => {
+                // Got all books and authors
+                
+                this.authors = data[0];
+                this.books = data[1];
+                this.setBookAndItem(bookId, itemId);
+              })
+          })
+        }
+      });
   }
 
   setBookAndItem(bookId, itemId) {
-    this.catalogService.getBooks().first().subscribe(x => {
-      this.books = x;
-      this.setCurrentBook((bookId)?x.find((y:Book) => y.bookId == bookId):x[0], itemId);
-    })
+    this.setCurrentBook((bookId)?this.books.find((y:Book) => y.bookId == bookId):this.books[0], itemId);
   }
 
   setCurrentBook(book: Book, itemId = null) {
@@ -62,18 +79,20 @@ export class InfoComponent {
     this.updateTypes(book, null);
   }
 
-  setCurrentItem(item: Item) {
+  showContent() {
+    document.getElementById('infoContent').style.display = 'block';
+    document.getElementById('previewContent').style.display = 'block';
+  }
+  
+  hideContent() {
     document.getElementById('infoContent').style.display = 'none';
+    document.getElementById('previewContent').style.display = 'none';
+  }
+  
+  setCurrentItem(item: Item) {
+    this.hideContent();
     this.currentItem = item;
     this.updatePages(item);
-    
-    if (item) {
-      this.router.navigate(['', item.bookId, item.itemId]);
-    } 
-    else {
-      this.router.navigate(['']);
-    }
-    
   }
 
   getTitle(item: Item, showBookId: boolean) {
@@ -138,16 +157,9 @@ export class InfoComponent {
       this.catalogService.getPages(item.bookId, item.itemId, 'json').subscribe(x => {
         this.pages = x;
         if (x.length > 0 && !/^\s*$/.test(x[0].filename)) {
-          infoContent.style.display = 'block';
-        }
-        else {
-          infoContent.style.display = 'none';
+          this.showContent();
         }
       })
-    }
-    else {
-      this.pages = [];
-      infoContent.style.display = 'none';
     }
   }
   
@@ -180,7 +192,7 @@ export class InfoComponent {
       this.showBookId = true;
     }
     
-    this.catalogService.getItems((this.searchAll)?null:(this.currentBook.bookId), query).first().subscribe(x => {
+    this.catalogService.getItems((this.searchAll)?null:(this.currentBook.bookId), query).subscribe(x => {
       this.items = x;
       this.setCurrentItem(x[0]);
     })
