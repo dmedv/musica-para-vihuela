@@ -1,7 +1,9 @@
-import { Injectable }     from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
+
 import { Book, Item, Author, Page, Type, Chapter } from './model';
-import { Observable }     from 'rxjs/Observable';
+
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -20,10 +22,10 @@ export class CatalogService {
         .map((res: Response) => { return res.json() || {}; });
   }
 
-  getItems(bookId: number, query:string): Observable<Item[]> {
-    var url = this.itemsUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
+  getItems(bookId: number, query: string = null): Observable<Item[]> {
+    let url = this.itemsUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
     if (query) {
-        url += ('?query=' + query);
+        url += ('?query=' + encodeURIComponent(query));
     }
     
     return this.http.get(url)
@@ -40,10 +42,10 @@ export class CatalogService {
         .map((res: Response) => { return res.json() || {}; });
   }
 
-  getTypes(bookId: number, query: string): Observable<Type[]> {
-    var url = this.typesUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
+  getTypes(bookId: number, query: string = null): Observable<Type[]> {
+    let url = this.typesUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
     if (query) {
-        url += ('?query=' + query);
+        url += ('?query=' + encodeURIComponent(query));
     }
     return this.http.get(url)
         .map((res: Response) => { return res.json() || {}; });

@@ -15,7 +15,6 @@ import { InfoModule} from './info.module';
     InfoModule,
     AppRoutingModule
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 

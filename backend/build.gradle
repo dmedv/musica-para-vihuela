@@ -41,6 +41,11 @@ task cleanExtra(type: Delete) {
 
 clean.dependsOn('cleanExtra');
 
+task explodedWar(type: Copy) {
+    into 'dist'
+    with war
+}
+
 war {
     destinationDir = file('dist')
 
