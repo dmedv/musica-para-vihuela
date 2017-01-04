@@ -25,7 +25,6 @@ export class InfoComponent {
   isSearchResult = false;
   selectedTypeId: number = -1;
   selectedChapterId: number = -1;
-  keepCurrentBook = false;
   
   constructor(
     private router: Router,
@@ -48,11 +47,12 @@ export class InfoComponent {
             let itemId = Number(params['itemId']);
             
             let f = function(that, bookId, itemId) {
-              if (that.keepCurrentBook && that.items.find((x: Item) => x.itemId == itemId)) {
+              if (that.items && that.items.find((x: Item) => x.itemId == itemId && x.bookId == bookId)) {
                 that.setItem(itemId)
               }
               else {
-                that.keepCurrentBook = false;
+                that.items = [];
+                that.isSearchResult = false;
                 that.setBookAndItem(bookId, itemId);
               }
             }
@@ -79,18 +79,16 @@ export class InfoComponent {
   }
 
   navigateToItem(item: Item) {
-    this.keepCurrentBook = this.isSearchResult;
     this.router.navigate(['', item.bookId, item.itemId]);
   }
   
   navigateToBook(book: Book) {
-    this.keepCurrentBook = false;
-    this.isSearchResult = false;
     this.router.navigate(['', book.bookId, 1]);
   }
   
   setBookAndItem(bookId: number, itemId: number) {
     let book = this.books.find((x: Book) => x.bookId == bookId);
+    
     this.currentBook = book;
     this.updateChapters(book);
     this.updateTypes(book);
