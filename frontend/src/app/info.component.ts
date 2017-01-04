@@ -49,34 +49,27 @@ export class InfoComponent {
       private router: Router,
       private route: ActivatedRoute,
       private catalogService: CatalogService) {
+  }
 
-    // This is tricky... We can't just subscribe to
-    // route.params in onNgInit, because onNgInit
-    // is not called during navigation within
-    // the same component.
-    router.events.subscribe((x: Event) => {
-      if (x instanceof NavigationEnd) {
-        // NavigationEnd event captured
-        this.route.params.first().subscribe((params: Params) => {
-          // Navigation parameters received
-          let bookId = Number(params['bookId']);
-          let itemId = Number(params['itemId']);
+  ngOnInit() {
+    this.route.params.subscribe((params: Params) => {
+      // Navigation parameters received
+      let bookId = Number(params['bookId']);
+      let itemId = Number(params['itemId']);
 
-          if (this.authors && this.books) {
+      if (this.authors && this.books) {
+        this.conditionalSet(this, bookId, itemId);
+      }
+      else {
+        Observable.forkJoin([
+            this.catalogService.getAuthors(),
+            this.catalogService.getBooks()])
+          .subscribe(x => {
+            // Got all books and authors
+            this.authors = x[0];
+            this.books = x[1];
             this.conditionalSet(this, bookId, itemId);
-          }
-          else {
-            Observable.forkJoin([
-                this.catalogService.getAuthors(),
-                this.catalogService.getBooks()])
-              .subscribe(x => {
-                // Got all books and authors
-                this.authors = x[0];
-                this.books = x[1];
-                this.conditionalSet(this, bookId, itemId);
-              })
-          }
-        });
+          })
       }
     });
   }
