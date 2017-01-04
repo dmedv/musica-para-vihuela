@@ -120,23 +120,23 @@ export class InfoComponent {
   }
 
   getItemTitle(item: Item, showBookId: boolean) {
-    if (!item) return '-';
+    if (!item) return '\u2012';
     
     let s = item.title.replace(/\#/g, ' ');
     if (showBookId) { 
-      s = '(' + item.bookId + ') ' + s;
+      s = item.bookId+' / ' + s;
     }
     return s;
   }
   
   getNotes(item: Item) {
-    if (!item || !item.notes) return '-';
+    if (!item || !item.notes) return '\u2012';
     
     return item.notes;
   }
   
   getBookTitle(book: Book, showId: boolean = true) {
-    if (!book) return '-';
+    if (!book) return '\u2012';
     
     return (showId)?(book.bookId + '. ' + book.title):book.title;
   }
@@ -148,7 +148,7 @@ export class InfoComponent {
   }
   
   getAuthorName(item: Item) {
-    if (!item) return '-';
+    if (!item) return '\u2012';
     
     for(let author of this.authors)
     {
@@ -157,7 +157,7 @@ export class InfoComponent {
   }
 
   getTypeName(item: Item) {
-    if (!item) return '-';
+    if (!item || !item.typeId) return '\u2012';
     
     for(let type of this.types)
     {
@@ -200,30 +200,40 @@ export class InfoComponent {
   }
   
   search() {
-    this.isSearchResult = true;
+    let query = (<HTMLInputElement>document.getElementById("searchInput")).value;
+    
+    if (query && !/^\s*$/.test(query)) {
+      query = '%' + query + '%';
+    }
+    else {
+      return;  // Ignore empty queries
+    }
+    
     if (!this.searchAll && !this.currentBook) {
       alert('You must select a book first');
       return;
     }
-    this.items = [];
-    let query = (<HTMLInputElement>document.getElementById("searchInput")).value;
-    
-    if (query && !/^\s*$/.test(query)) {
-      query = '%'+query+'%';
-    }
-    
-    this.chapters = [new Chapter(-1, '*')];
-    this.selectedChapterId = this.chapters[0].chapterId;
-    (<HTMLSelectElement>document.getElementById("chapterSelect")).disabled = true;
-    this.updateTypes((this.searchAll)?null:(this.currentBook), query);
-   
-    if (this.searchAll) {
-      this.currentBook = null;
-    }
-    
+
     this.catalogService.getItems((this.searchAll)?null:(this.currentBook.bookId), query).subscribe(x => {
-      this.items = x;
-      this.setItem(x[0].itemId);
+      if (x.length > 0) {
+        this.isSearchResult = true;
+        this.items = x;
+        if (this.searchAll) {
+          this.currentBook = null;
+        }
+        
+        this.updateTypes((this.searchAll)?null:(this.currentBook), query);
+        
+        // Disable chapter selection
+        this.chapters = [new Chapter(-1, '*')];
+        this.selectedChapterId = this.chapters[0].chapterId;
+        (<HTMLSelectElement>document.getElementById("chapterSelect")).disabled = true;
+        
+        this.navigateToItem(x[0]);
+      }
+      else {
+        alert('No results');
+      }
     })
     
   }
