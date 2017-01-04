@@ -8,54 +8,69 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class CatalogService {
-  private booksUrl = '/api/books';
-  private itemsUrl = '/api/books/{bookId}/items'
-  private authorsUrl = '/api/authors';
-  private typesUrl = '/api/books/{bookId}/types';
-  private pagesUrl = '/api/books/{bookId}/items/{itemId}/{output}';
-  private chaptersUrl = '/api/books/{bookId}/chapters'
+
+  // readonly urlPrefix = 'http://localhost:8080/musica-para-vihuela/api';
+  readonly urlPrefix = '/api';
+
+  readonly books = '/books';
+  readonly items = '/books/{bookId}/items'
+  readonly authors = '/authors';
+  readonly types = '/books/{bookId}/types';
+  readonly pages = '/books/{bookId}/items/{itemId}/{output}';
+  readonly chapters = '/books/{bookId}/chapters'
 
   constructor (private http: Http) {}
 
   getBooks(): Observable<Book[]> {
-    return this.http.get(this.booksUrl)
-        .map((res: Response) => { return res.json() || {}; });
+    return this.http.get(this.urlPrefix + this.books)
+      .map((res: Response) => { return res.json() || []; });
   }
 
   getItems(bookId: number, query: string = null): Observable<Item[]> {
-    let url = this.itemsUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
+    let url = this.urlPrefix + this.items
+      .replace(/\{bookId\}/g, bookId ? String(bookId) : '*');
+
     if (query) {
-        url += ('?query=' + encodeURIComponent(query));
+      url += ('?query=' + encodeURIComponent(query));
     }
-    
+
     return this.http.get(url)
-        .map((res: Response) => { return res.json() || {}; });
+      .map((res: Response) => { return res.json() || []; });
   }
 
   getChapters(bookId: number): Observable<Chapter[]> {
-    return this.http.get(this.chaptersUrl.replace(/\{bookId\}/g, String(bookId)))
-        .map((res: Response) => { return res.json() || {}; });
+    let url = this.urlPrefix + this.chapters
+      .replace(/\{bookId\}/g, String(bookId));
+
+    return this.http.get(url)
+      .map((res: Response) => { return res.json() || []; });
   }
 
   getAuthors(): Observable<Author[]> {
-    return this.http.get(this.authorsUrl)
-        .map((res: Response) => { return res.json() || {}; });
+    return this.http.get(this.urlPrefix + this.authors)
+      .map((res: Response) => { return res.json() || []; });
   }
 
   getTypes(bookId: number, query: string = null): Observable<Type[]> {
-    let url = this.typesUrl.replace(/\{bookId\}/g, (bookId)?String(bookId):'*');
+    let url = this.urlPrefix + this.types
+      .replace(/\{bookId\}/g, bookId ? String(bookId) : '*');
+
     if (query) {
-        url += ('?query=' + encodeURIComponent(query));
+      url += ('?query=' + encodeURIComponent(query));
     }
+
     return this.http.get(url)
-        .map((res: Response) => { return res.json() || {}; });
+      .map((res: Response) => { return res.json() || []; });
   }
 
   getPages(bookId: number, itemId: number, output: string): Observable<Page[]> {
-    return this.http.get(this.pagesUrl
+    let url = this.urlPrefix + this.pages
       .replace(/\{bookId\}/g, String(bookId))
       .replace(/\{itemId\}/g, String(itemId))
-      .replace(/\{output\}/g, output))
-        .map((res: Response) => { return res.json() || {}; });
+      .replace(/\{output\}/g, output);
+
+    return this.http.get(url)
+      .map((res: Response) => { return res.json() || []; });
   }
+
 }
