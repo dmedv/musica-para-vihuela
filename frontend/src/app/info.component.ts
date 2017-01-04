@@ -78,7 +78,7 @@ export class InfoComponent {
   }
 
   navigateToItem(item: Item) {
-    this.keepCurrentBook = true;
+    this.keepCurrentBook = this.isSearchResult;
     this.router.navigate(['', item.bookId, item.itemId]);
   }
   
