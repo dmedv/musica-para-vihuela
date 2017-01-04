@@ -48,10 +48,11 @@ export class InfoComponent {
             let itemId = Number(params['itemId']);
             
             let f = function(that, bookId, itemId) {
-              if (that.keepCurrentBook) {
+              if (that.keepCurrentBook && that.items.find((x: Item) => x.itemId == itemId)) {
                 that.setItem(itemId)
               }
               else {
+                that.keepCurrentBook = false;
                 that.setBookAndItem(bookId, itemId);
               }
             }
