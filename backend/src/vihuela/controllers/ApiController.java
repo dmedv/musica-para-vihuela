@@ -294,6 +294,7 @@ public class ApiController {
                       contentStream.close();
                     }
                     document.save(response.getOutputStream());
+                    document.close();
                     break;
                 default:
                     response.setStatus(HttpStatus.NOT_IMPLEMENTED.value());
