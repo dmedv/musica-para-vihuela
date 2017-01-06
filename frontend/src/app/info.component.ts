@@ -205,7 +205,7 @@ export class InfoComponent {
     }
 
     if (!this.searchAllBooks && !this.currentBook) {
-      alert('You must select a book first');
+      this.showMessage('You must select a book first');
       return;
     }
 
@@ -214,7 +214,7 @@ export class InfoComponent {
         this.catalogService.getItems(maybeBookId, query),
         this.catalogService.getTypes(maybeBookId, query)])
       .subscribe(x => {
-        if (x.length > 0) {
+        if (x[0].length > 0) {
           this.isSearchResult = true;
           if (this.searchAllBooks) {
             this.currentBook = null;
@@ -233,9 +233,14 @@ export class InfoComponent {
           this.navigateToItem(this.items[0]);
         }
         else {
-          alert('No results');
+          this.showMessage('No results');
         }
       });
+  }
+  
+  showMessage(message: string) {
+    document.getElementById("messageText").innerText = message;
+    document.getElementById("messageToggle").click();
   }
 
   downloadPdf(item: Item): void {
