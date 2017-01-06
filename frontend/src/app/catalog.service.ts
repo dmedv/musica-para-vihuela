@@ -9,7 +9,7 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class CatalogService {
 
-  // readonly urlPrefix = 'http://localhost:8080/musica-para-vihuela/api';
+  //readonly urlPrefix = 'http://localhost:8080/musica-para-vihuela/api';
   readonly urlPrefix = '/api';
 
   readonly books = '/books';
