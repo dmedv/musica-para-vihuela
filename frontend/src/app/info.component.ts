@@ -31,18 +31,20 @@ export class InfoComponent {
   selectedChapterId: number = -1;
 
   conditionalSet(that, bookId, itemId): void {
-    if (that.items && that.items.find(
-        (x: Item) =>
-            x.itemId == itemId &&
-            x.bookId == bookId)) {
-
-      that.setItem(itemId);
+    if (that.items) {
+      let item =  that.items.find(
+          (x: Item) =>
+              x.itemId == itemId &&
+              x.bookId == bookId)
+      if (item) { 
+        that.setItemObj(item);
+        return;
+      }
     }
-    else {
-      that.items = [];
-      that.isSearchResult = false;
-      that.setBookAndItem(bookId, itemId);
-    }
+    
+    that.items = [];
+    that.isSearchResult = false;
+    that.setBookAndItem(bookId, itemId);
   }
 
   constructor(
@@ -110,6 +112,12 @@ export class InfoComponent {
   setItem(itemId: number): void {
     this.hideContent();
     let item: Item = this.items.find((x: Item) => x.itemId == itemId);
+    this.currentItem = item;
+    this.updatePages(item);
+  }
+
+  setItemObj(item: Item): void {
+    this.hideContent();
     this.currentItem = item;
     this.updatePages(item);
   }
