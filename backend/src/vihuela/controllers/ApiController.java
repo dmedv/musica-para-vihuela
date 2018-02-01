@@ -19,8 +19,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDJpeg;
+import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -44,8 +45,9 @@ import vihuela.model.Item;
 import vihuela.model.Page;
 import vihuela.model.Type;
 
-@CrossOrigin
 @RestController
+@CrossOrigin
+@RequestMapping("/api/*")
 public class ApiController {
 
     private static final Logger logger = LogManager.getLogger(ApiController.class);
@@ -56,7 +58,7 @@ public class ApiController {
     @Autowired
     AppConfig appConfig;
 
-    @RequestMapping(value = "/api/books", method = RequestMethod.GET)
+    @RequestMapping(value = "books", method = RequestMethod.GET)
     public Iterable<Book> getBooks() throws Exception {
         Connection connection = null;
         Statement statement = null;
@@ -81,7 +83,7 @@ public class ApiController {
         }
     }
 
-    @RequestMapping(value = "/api/authors", method = RequestMethod.GET)
+    @RequestMapping(value = "authors", method = RequestMethod.GET)
     public Iterable<Author> getAuthors() throws Exception {
         Connection connection = null;
         Statement statement = null;
@@ -106,7 +108,7 @@ public class ApiController {
         }
     }
     
-    @RequestMapping(value = "/api/books/{bookId}/chapters", method = RequestMethod.GET)
+    @RequestMapping(value = "books/{bookId}/chapters", method = RequestMethod.GET)
     public Iterable<Chapter> getChapters(@PathVariable int bookId) throws Exception {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -132,7 +134,7 @@ public class ApiController {
         }
     }
     
-    @RequestMapping(value = "/api/books/{maybeBookId}/items", method = RequestMethod.GET)
+    @RequestMapping(value = "books/{maybeBookId}/items", method = RequestMethod.GET)
     public Iterable<Item> getItems(
             @PathVariable String maybeBookId, 
             @RequestParam(name="query", required=false) String query) throws Exception {
@@ -187,7 +189,7 @@ public class ApiController {
         }
     }
     
-    @RequestMapping(value = "/api/books/{maybeBookId}/types", method = RequestMethod.GET)
+    @RequestMapping(value = "books/{maybeBookId}/types", method = RequestMethod.GET)
     public Iterable<Type> getTypes(
             @PathVariable String maybeBookId, 
             @RequestParam(name="query", required=false) String query) throws Exception {
@@ -236,7 +238,7 @@ public class ApiController {
         }
     }
     
-    @RequestMapping(value = "/api/books/{bookId}/items/{itemId}/{output}", method = RequestMethod.GET)
+    @RequestMapping(value = "books/{bookId}/items/{itemId}/{output}", method = RequestMethod.GET)
     public Object getPages(
             @PathVariable int bookId, 
             @PathVariable int itemId, 
@@ -286,7 +288,7 @@ public class ApiController {
                     for (Page bookPage: pageList) {
                       String filename = context.getRealPath("/") + "/images/pages/" + bookPage.getFilename();
                       FileInputStream input = new FileInputStream(filename);
-                      PDJpeg image = new PDJpeg(document, input);
+                      PDImageXObject image = JPEGFactory.createFromStream(document, input);
                       PDPage documentPage = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
                       document.addPage(documentPage);
                       PDPageContentStream contentStream = new PDPageContentStream(document, documentPage);
