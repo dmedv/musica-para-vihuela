@@ -1,0 +1,25 @@
+<div id="pagesView" class="container-flex h-100">
+  <div id="carousel" class="carousel h-100" data-ride="carousel" data-wrap="false" data-interval="false">
+    
+    <ol class="carousel-indicators">
+      <li *ngFor="let page of pages; index as i; first as isFirst" [class.active]="isFirst" data-target="#carousel" [attr.data-slide-to]="i"></li>
+    </ol>
+
+    <div class="carousel-inner h-100 d-flex" style="align-items: center;">
+      <div *ngFor="let page of pages; first as isFirst" class="carousel-item" [class.active]="isFirst">
+          <img class="d-block page-image" src="images/pages/{{page.filename}}">
+      </div>
+    </div>
+    
+    <a id="prevControl" class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+
+    <a id="nextControl" class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+    
+  </div>
+</div>

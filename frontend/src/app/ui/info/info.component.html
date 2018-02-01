@@ -1,0 +1,193 @@
+<div id="container" class="container-fluid h-100">
+  
+  <div id="header" class="row align-items-end">
+    
+    <div class="col-4">
+      <div class="form-group">
+        <label for="bookSelect">
+          <b>Book:</b>
+        </label>
+        <div id="bookSelect" class="input-group">
+          <input class="form-control book-title" type="text" value="{{getBookTitle(currentBook)}}" disabled/>
+          <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+
+            <div class="dropdown-menu dropdown-menu-right">
+              <a *ngFor="let book of books" (click)="navigateToBook(book)" class="dropdown-item selectable">
+                {{getBookTitle(book)}}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-8">
+      
+      <div class="row">
+      
+        <div class="col-6">
+          <div class="form-check">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="a" [value]="true" [(ngModel)]="searchAll" checked>
+              <span style="white-space: nowrap">Search all books</span>
+            </label>
+          </div>
+          <div class="form-check">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="a" [value]="false" [(ngModel)]="searchAll">
+              <span style="white-space: nowrap">Search current book</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="col-6 text-right">
+          <label id="version">v3.0</label>
+          <a class="link-icon" href="#" onclick="$('#infoModal').modal('show'); return false;" title="About">
+            <i class="fa fa-info" aria-hidden="true"></i>
+          </a>
+          <a class="link-icon" href="https://github.com/dmedv/musica-para-vihuela" title="This project on GitHub">
+            <i class="fa fa-github" style="font-size:1.5em; top:2px;" aria-hidden="true"></i>
+          </a>
+        </div>
+
+      </div>
+
+      <div class="row" style="padding-top: 8px">
+        
+        <div class="col-12">
+          <div class="form-group">
+            <div id="search" class="input-group">
+              <input id="searchInput" class="form-control" type="text" (keypress)="keyboardEventHandler($event)">
+              <span class="input-group-append">
+                <button id="searchButton" class="btn btn-outline-secondary" type="button" (click)="search()">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="content" class="row">
+    
+    <div class="col-4 auto-resize"> 
+      <div id="itemsPanel" class="list-group">
+        <a *ngFor="let item of items | itemFilter:[selectedChapterId, selectedTypeId]" (click)="navigateToItem(item)" class="list-group-item list-group-item-action border-0 selectable">
+            {{getItemTitle(item, isSearchResult)}}&nbsp;
+        </a>
+      </div>
+    </div>
+
+    <div class="col-8 auto-resize">
+      <div id="infoContent" style="display:none">
+        <nav class="nav">
+          <a class="nav-link" href="{{viewHref}}" target="_blank">View</a>
+          <a class="nav-link" href="#" (click)="downloadZip(currentItem)">Download images</a>
+          <a class="nav-link" href="#" (click)="downloadPdf(currentItem)">Download PDF</a>
+        </nav>
+        <br/>
+        <table class="table">
+          <tbody>
+            <tr>
+                <th scope="row">Book:</th>
+                <td>{{getBookTitle(getBookForItem(currentItem), false)}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Author:</th>
+                <td>{{getAuthorName(currentItem)}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Title:</th>
+                <td>{{getItemTitle(currentItem, false)}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Type:</th>
+                <td>{{getTypeName(currentItem)}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Notes:</th>
+                <td class="col-11">{{getNotes(currentItem)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="footer" class="row">
+    
+    <div class="col-4">
+      <div class="form-group">
+        <label for="chapterSelect">
+          <b>Chapter:</b>
+        </label>
+        <select id="chapterSelect" class="form-control" [(ngModel)]="selectedChapterId">
+          <option *ngFor="let chapter of chapters" [ngValue]="chapter.chapterId">{{chapter.title}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="typeSelect">
+          <b>Type:</b>
+        </label>
+        <select id="typeSelect" class="form-control" [(ngModel)]="selectedTypeId">
+          <option *ngFor="let type of types" [ngValue]="type.typeId">{{type.title}}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-8">
+      <div class="footerPanel">
+        <div id="previewContent">
+          <div id="previewCell">
+            <a *ngFor="let page of pages" href="images/pages/{{page.filename}}" target="_blank">
+              <img src="images/preview/{{page.filename}}"/>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="messageToggle" data-toggle="modal" data-target="#messageModal" style="display:none"></div>
+
+<div class="modal fade open" id="messageModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 id="messageText"></h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade open" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4>Info</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Based on the catalog published on CD-ROM: Libros De Musica Para Vihuela 1536-1576 (edited by Gerardo Arriaga, Carlos González and Javier Somoza).</p>
+        <p>CD-ROM © 2003 Música Prima, Ópera Tres</p>
+        <p>Images © Biblioteca Nacional de España, Real Biblioteca de El Escorial, Archivo General de Simancas, Österreichische Nationalbibliothek.</p>
+        <p><i>DISCLAIMER: No copyright infringement intended. To the best of my knowledge, fair use of copyrighted material applies. 
+          If you are using this website, you should also buy the original CD-ROM - some stores might still have it in stock.</i>
+        </p>
+        <a href="https://www.lacg.net/product/cd-rom-libros-de-musica-para-vihuela/" target="_blank">LACG Store</a><br/>
+        <a href="https://www.stringsbymail.com/cd-rom-libros-de-musica-para-vihuela-1536-1576-4870.html" target="_blank">Strings By Mail</a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,10 +1,11 @@
-import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app.routing';
+import { RoutingModule } from './routing/routing.module';
+import { UiModule} from './ui/ui.module';
+
 import { AppComponent } from './app.component';
-
-import { InfoModule} from './info.module';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -12,10 +13,11 @@ import { InfoModule} from './info.module';
   ],
   imports: [
     BrowserModule,
-    InfoModule,
-    AppRoutingModule
+    UiModule,
+    RoutingModule,
+    HttpClientModule
   ],
+  providers: [HttpClientModule],
   bootstrap: [AppComponent]
 })
-
 export class AppModule { }

@@ -1,0 +1,124 @@
+body {
+    margin: 0;
+    height: 100%;
+}
+
+.selectable {
+    cursor: pointer;
+}
+
+.auto-resize {
+    overflow-y: auto;
+}
+
+.fa-info {
+    font-size:1.5em; 
+    padding-right: 15px;
+}
+
+.fa-github {
+    font-size:1.5em; 
+}
+
+div.footerPanel {
+    height: 180px;
+}
+
+a.link-icon:link, a.link-icon:visited {
+    color: rgb(159, 159, 159);
+}
+
+a.link-icon:hover, a.link-icon:active {
+    color: rgb(79, 79, 79);
+    text-decoration: none;
+}
+
+input.book-title:disabled {
+    background-color:white;
+    cursor:default;
+}
+
+#footer {
+    background-color: rgb(238, 238, 238);
+    border-top: 1px solid rgb(143, 143, 143);
+}
+
+#content div.col-4 {
+    background-color: white;
+    padding: 0px;
+}
+
+#content div.col-8 {
+    padding-top: 10px;
+    background-color: rgb(238, 238, 238);
+    border-left: 1px solid rgb(143, 143, 143);;
+}
+
+#infoContent label {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+#infoContent td {
+    text-align: justify;
+}
+
+#header {
+    border-bottom: 1px solid rgb(143, 143, 143);
+}
+
+#header div.col-4 {
+    padding-top: 10px;
+}
+
+#header div.col-8 {
+    padding-top: 10px;
+    border-left: 1px solid rgb(143, 143, 143);
+}
+
+#footer div.col-4 {
+    padding-top: 10px;
+}
+
+#footer div.col-8 {
+    padding-top: 10px;
+    border-left: 1px solid rgb(143, 143, 143);
+}
+
+#itemsPanel a {
+    padding: 0px;
+    padding-left: 16px;
+    color: black;
+}
+
+#previewContent {
+    padding: 0px;
+    background-color: white;
+    clear: both;
+    overflow: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    background-color: rgb(238, 238, 238);
+}
+
+#previewCell {
+    display: table-cell;
+    vertical-align: middle;
+    height: 160px;
+    padding: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+#previewCell a {
+    text-decoration: none;
+}
+
+#previewCell img {
+    border: 1px solid rgb(143, 143, 143);
+}
+
+#version {
+    padding-right: 15px; 
+    color: rgb(159, 159, 159);
+}

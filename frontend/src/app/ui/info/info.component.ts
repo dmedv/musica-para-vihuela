@@ -1,19 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params, NavigationEnd, Event } from '@angular/router';
 
-import { Book, Item, Author, Page, Type, Chapter } from './model';
-import { CatalogService } from './catalog.service';
+import { Book, Item, Author, Page, Type, Chapter } from '../../model';
+import { CatalogService } from '../../catalog.service';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/first';
 
 @Component({
-  styleUrls: ['./info.component.css'],
-  templateUrl: './info.component.html'
+  selector: 'app-info',
+  templateUrl: './info.component.html',
+  styleUrls: ['./info.component.css']
 })
-
-export class InfoComponent {
+export class InfoComponent implements OnInit {
 
   readonly dashChar: string = '\u2012';
 
@@ -25,37 +25,40 @@ export class InfoComponent {
   types: Type[];
   chapters: Chapter[];
   pages: Page[];
-  searchAllBooks: boolean = true;
+  searchAll: boolean = true;
   isSearchResult: boolean = false;
   selectedTypeId: number = -1;
   selectedChapterId: number = -1;
+  viewHref: string;
 
   conditionalSet(that, bookId, itemId): void {
     if (that.items) {
-      let item =  that.items.find(
-          (x: Item) =>
-              x.itemId == itemId &&
-              x.bookId == bookId)
-      if (item) { 
+      let item = that.items.find(
+        (x: Item) =>
+          x.itemId == itemId &&
+          x.bookId == bookId)
+      if (item) {
         that.setItemObj(item);
         return;
       }
     }
-    
+
     that.items = [];
     that.isSearchResult = false;
     that.setBookAndItem(bookId, itemId);
   }
 
   constructor(
-      private router: Router,
-      private route: ActivatedRoute,
-      private catalogService: CatalogService) {
+    private router: Router,
+    private route: ActivatedRoute,
+    private catalogService: CatalogService) {
   }
 
   ngOnInit() {
     this.route.params.subscribe((params: Params) => {
       // Navigation parameters received
+      this.viewHref = '#'+ this.router.url + "/view";
+
       let bookId = Number(params['bookId']);
       let itemId = Number(params['itemId']);
 
@@ -64,12 +67,12 @@ export class InfoComponent {
       }
       else {
         Observable.forkJoin([
-            this.catalogService.getAuthors(),
-            this.catalogService.getBooks()])
-          .subscribe(x => {
+          this.catalogService.getAuthors(),
+          this.catalogService.getBooks()])
+          .subscribe(([authors, books]: [Author[], Book[]]) => {
             // Got all books and authors
-            this.authors = x[0];
-            this.books = x[1];
+            this.authors = authors;
+            this.books = books;
             this.conditionalSet(this, bookId, itemId);
           })
       }
@@ -90,7 +93,8 @@ export class InfoComponent {
     this.currentBook = book;
     this.updateChapters(book);
     this.updateTypes(book);
-
+    //TODO: Some weird bug here... Maybe need to make sure 
+    //that items, chapters and types are loaded together.
     (<HTMLSelectElement>document.getElementById("chapterSelect")).disabled = false;
 
     this.catalogService.getItems(book.bookId).subscribe((x: Item[]) => {
@@ -141,7 +145,7 @@ export class InfoComponent {
   getBookTitle(book: Book, showId: boolean = true): string {
     if (!book) return this.dashChar;
 
-    return (showId)?(book.bookId + '. ' + book.title):book.title;
+    return (showId) ? (book.bookId + '. ' + book.title) : book.title;
   }
 
   getBookForItem(item: Item): Book {
@@ -153,18 +157,16 @@ export class InfoComponent {
   getAuthorName(item: Item): string {
     if (!item) return this.dashChar;
 
-    for(let author of this.authors)
-    {
-      if(author.authorId == item.authorId) return author.name;
+    for (let author of this.authors) {
+      if (author.authorId == item.authorId) return author.name;
     }
   }
 
   getTypeName(item: Item): string {
     if (!item || !item.typeId) return this.dashChar;
 
-    for(let type of this.types)
-    {
-      if(type.typeId == item.typeId) return type.title;
+    for (let type of this.types) {
+      if (type.typeId == item.typeId) return type.title;
     }
   }
 
@@ -185,7 +187,6 @@ export class InfoComponent {
   }
 
   updatePages(item: Item): void {
-    let infoContent = document.getElementById('infoContent');
     if (this.currentItem) {
       this.catalogService.getPages(item.bookId, item.itemId, 'json').subscribe((x: Page[]) => {
         this.pages = x;
@@ -212,24 +213,24 @@ export class InfoComponent {
       return;  // Ignore empty queries
     }
 
-    if (!this.searchAllBooks && !this.currentBook) {
+    if (!this.searchAll && !this.currentBook) {
       this.showMessage('You must select a book first');
       return;
     }
 
-    let maybeBookId = this.searchAllBooks ? null : this.currentBook.bookId;
+    let maybeBookId = this.searchAll ? null : this.currentBook.bookId;
     Observable.forkJoin([
-        this.catalogService.getItems(maybeBookId, query),
-        this.catalogService.getTypes(maybeBookId, query)])
-      .subscribe(x => {
-        if (x[0].length > 0) {
+      this.catalogService.getItems(maybeBookId, query),
+      this.catalogService.getTypes(maybeBookId, query)])
+      .subscribe(([items, types]: [Item[], Type[]]) => {
+        if (items.length > 0) {
           this.isSearchResult = true;
-          if (this.searchAllBooks) {
+          if (this.searchAll) {
             this.currentBook = null;
           }
 
-          this.items = x[0];
-          this.types = x[1];
+          this.items = items;
+          this.types = types;
           this.types.unshift(new Type(-1, '*'));
           this.selectedTypeId = -1;
 
@@ -245,18 +246,20 @@ export class InfoComponent {
         }
       });
   }
-  
+
   showMessage(message: string) {
     document.getElementById("messageText").innerText = message;
     document.getElementById("messageToggle").click();
   }
 
-  downloadPdf(item: Item): void {
+  downloadPdf(item: Item): boolean {
     window.open('/api/books/' + item.bookId + '/items/' + item.itemId + '/pdf');
+    return false;
   }
 
-  downloadZip(item: Item): void {
+  downloadZip(item: Item): boolean {
     window.open('/api/books/' + item.bookId + '/items/' + item.itemId + '/zip', '_self');
+    return false;
   }
 
 }
