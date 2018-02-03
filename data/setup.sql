@@ -1,6 +1,6 @@
 SOURCE schema.sql
 
-USE `vihuela2`
+USE `vihuela`
 
 LOAD DATA LOCAL INFILE 'authors.csv' INTO TABLE `authors`
   FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"';
