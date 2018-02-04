@@ -10,7 +10,6 @@ import { Book, Item, Author, Page, Type, Chapter } from './model';
 @Injectable()
 export class CatalogService {
     readonly urlPrefix = '/api';
-    //readonly urlPrefix = 'http://localhost:8080/musica-para-vihuela/api';
     readonly books = '/books';
     readonly items = '/books/{bookId}/items';
     readonly authors = '/authors';
