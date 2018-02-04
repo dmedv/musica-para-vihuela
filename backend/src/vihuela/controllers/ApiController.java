@@ -1,6 +1,7 @@
 package vihuela.controllers;
 
 import java.io.FileInputStream;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -245,6 +246,7 @@ public class ApiController {
             @PathVariable String output, 
             HttpServletResponse response) throws Exception {
         
+        String imagesRoot = appConfig.getAppSettings().getImagesRoot();
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -273,7 +275,7 @@ public class ApiController {
                     response.setHeader("Content-Disposition","attachment;filename=\"images.zip\""); 
                     ZipOutputStream zip = new ZipOutputStream(response.getOutputStream());
                     for (Page bookPage: pageList) {
-                      String filename = context.getRealPath("/") + "/images/pages/" + bookPage.getFilename();
+                      String filename = Paths.get(imagesRoot, "pages", bookPage.getFilename()).toString();
                       FileInputStream input = new FileInputStream(filename);
                       zip.putNextEntry(new ZipEntry(bookPage.getFilename().split("/")[1]));
                       IOUtils.copy(input, zip);
@@ -286,7 +288,7 @@ public class ApiController {
                     response.setContentType("application/pdf");
                     PDDocument document = new PDDocument();
                     for (Page bookPage: pageList) {
-                      String filename = context.getRealPath("/") + "/images/pages/" + bookPage.getFilename();
+                      String filename = Paths.get(imagesRoot, "pages", bookPage.getFilename()).toString();
                       FileInputStream input = new FileInputStream(filename);
                       PDImageXObject image = JPEGFactory.createFromStream(document, input);
                       PDPage documentPage = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
