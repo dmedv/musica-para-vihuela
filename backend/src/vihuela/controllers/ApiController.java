@@ -286,6 +286,7 @@ public class ApiController {
                     break;
                 case "pdf":
                     response.setContentType("application/pdf");
+                    response.setHeader("Content-Disposition","attachment;filename=\"document.pdf\""); 
                     PDDocument document = new PDDocument();
                     for (Page bookPage: pageList) {
                       String filename = Paths.get(imagesRoot, "pages", bookPage.getFilename()).toString();

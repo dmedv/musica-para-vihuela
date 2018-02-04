@@ -253,7 +253,7 @@ export class InfoComponent implements OnInit {
   }
 
   downloadPdf(item: Item): boolean {
-    window.open('/api/books/' + item.bookId + '/items/' + item.itemId + '/pdf');
+    window.open('/api/books/' + item.bookId + '/items/' + item.itemId + '/pdf', '_self');
     return false;
   }
 
